@@ -1,9 +1,10 @@
-
+from scraper import scrap_data
 
 
 def main():
-    pass
-    # Scraping Data Code here
+
+    # Scraping Data
+    data = scrap_data()
 
     # Formatting Data
 

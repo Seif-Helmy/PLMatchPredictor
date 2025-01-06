@@ -3,15 +3,14 @@ import requests
 
 
 def scrap_data():
+
+    # Sending request to access FBRef
     url = "https://fbref.com/en/comps/9/Premier-League-Stats"
     website = requests.get(url)
 
-    if website.status_code == 200:
-        print("good")
-    else:
-        print("mot")
 
 
+scrap_data()
 
 
 
