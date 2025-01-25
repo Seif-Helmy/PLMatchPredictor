@@ -1,10 +1,10 @@
-from scraper import scrap_data
+from scraper import scrap_data_team_season_stats, scrap_data_team_past_fixtures
 
 
 def main():
 
     # Scraping Data
-    data = scrap_data()
+    scrap_data_team_past_fixtures()
 
     # Formatting Data
 

@@ -62,11 +62,15 @@ def scrap_data_team_past_fixtures():
 
             club_shooting_fixtures.columns = club_shooting_fixtures.columns.droplevel()  # Dropping the first headers
 
+            club_fixtures = club_fixtures[["Date", "Comp", "Venue", "Result", "GF", "GA",
+                                          "Opponent", "xG", "xGA", "Poss"]]
+
             try:
                 fixtures = club_fixtures.merge(club_shooting_fixtures[
                                                    ["Date", "Sh", "SoT", "SoT%", "G/Sh", "G/SoT"]], on="Date")
             except ValueError:
                 continue
+
 
             fixtures = fixtures[fixtures["Comp"] == "Premier League"]
             fixtures["Season"] = season
@@ -75,8 +79,7 @@ def scrap_data_team_past_fixtures():
             time.sleep(8)
 
     all_fixtures_df = pd.concat(all_fixtures)
-    all_fixtures_df.to_csv("AllFixtures")
-
+    all_fixtures_df.to_csv("AllFixtures.csv")
 
 
 
@@ -122,3 +125,5 @@ def scrap_data_team_season_stats():
     return pd.merge(current_form_table, ag_shootings_df, on="Squad")
 
 
+
+scrap_data_team_past_fixtures()
