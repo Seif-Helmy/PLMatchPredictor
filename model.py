@@ -1,7 +1,8 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
+from sklearn.metrics import accuracy_score
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_rows', None)
 
 
 
@@ -21,15 +22,22 @@ def cleanup_data(csv_file):
     rf = RandomForestClassifier(n_estimators=50, min_samples_split=10, random_state=1)
 
     training = past_fixtures[past_fixtures["Date"] < "2024-07-30"]
+    print(training)
     test = past_fixtures[past_fixtures["Date"] > "2024-07-30"]
+    print(test)
 
     predictors = ["Venue", "Result", "GF", "GA", "OppCode", "Poss", "Sh", "SoT", "SoT%",  "G/Sh", "G/SoT"]
+    rf.fit(training[predictors], training["Result"])
 
+    pred = rf.predict(test[predictors])
 
+    print(accuracy_score(test["Result"], pred))
     print()
     print()
     print()
     print(past_fixtures.head())
+
+
 
 
 cleanup_data(None)
