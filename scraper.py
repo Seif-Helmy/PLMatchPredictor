@@ -122,8 +122,8 @@ def scrap_data_team_season_stats():
     ag_shootings_df.columns.values[3] = "Vs-G/SoT"
     ag_shootings_df["Squad"] = ag_shootings_df["Squad"].str.replace("vs ", "")
 
-    return pd.merge(current_form_table, ag_shootings_df, on="Squad")
+    season_stats = pd.merge(current_form_table, ag_shootings_df, on="Squad")
+
+    season_stats.to_csv("AllFixtures.csv")
 
 
-
-scrap_data_team_past_fixtures()
