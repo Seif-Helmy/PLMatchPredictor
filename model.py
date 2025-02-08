@@ -5,6 +5,7 @@ from sklearn.metrics import accuracy_score, precision_score
 
 
 # TODO : Optimize and Improve Model
+# SCRAPER.PY AND CLEANER.PY ARE COMPLETE
 def make_predictions(data, predictors):
 
     rf = RandomForestClassifier(n_estimators=100, random_state=42)
