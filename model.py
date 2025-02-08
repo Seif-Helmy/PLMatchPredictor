@@ -2,10 +2,20 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score
 
-pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
+
+class MissingDict(dict):
+    __missing__ = lambda self, key: key
 
 
+
+map_values = {"Brighton and Hove Albion": "Brighton",
+              "Manchester United": "Manchester Utd",
+              "Newcastle United": "Newcastle Utd",
+              "Tottenham Hotspur": "Tottenham",
+              "West Ham United": "West Ham",
+              "Wolverhampton Wanderers": "Wolves"}
+
+mapping = MissingDict(**map_values)
 
 
 def cleanup_data(csv_file):
@@ -34,7 +44,6 @@ def cleanup_data(csv_file):
     make_predictions(past_fixtures_rolling, predictors + new_predictors_rolling)
 
 
-
 def rolling_averages(group, cols, new_cols):
 
     group = group.sort_values("Date")
@@ -57,6 +66,9 @@ def make_predictions(data, predictors):
 
     accuracy = accuracy_score(test["Result"], prediction)
 
+    precision = precision_score(test["Result"], prediction)
+
+    print(precision)
     print(accuracy)
 
 
