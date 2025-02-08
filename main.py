@@ -1,22 +1,29 @@
 from scraper import scrap_data_team_season_stats, scrap_data_team_past_fixtures
+from cleaner import clean_fixtures_table
 
 
 
 
 
 def main():
-    get_and_format_club_fixtures_data()
+    fixtures_data = get_and_clean_club_fixtures_data()
 
 
 
 
 
-def get_and_format_club_fixtures_data():
+def get_and_clean_club_fixtures_data():
 
     # Scraping Data Past Seasons' Fixtures data and creating csv file
     csv_file_path = scrap_data_team_past_fixtures()
 
-    # Formatting the Data
+    # Cleaning the Data
+    return clean_fixtures_table(csv_file_path)
+
+
+
+
+
 
 
 if __name__ == "__main__":
