@@ -1,4 +1,3 @@
+This Project aims to predict the outcomes of Premier League Matches
 
-This Project aims to predict the outcomes of the next premier league game week
-
-XG goals Poisson distribution
+Created the Base of the whole project and now working overall on improving and optimizing it. Currently optimizing and improving scrapping
