@@ -3,12 +3,39 @@ import requests
 import pandas as pd
 from io import StringIO
 import time
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
 
 
 
 
+
+
+
+
+
+# If there's issue with requesting the page, run this to know how long to wait before retrying
+def check_page_request(page):
+
+    if page.status_code == 200:
+        print("Page request is working!")
+
+    else:
+        print(f"Error: {page.status_code}")
+
+        if page.status_code == 429:
+            retry_after = page.headers.get("Retry-After")
+            wait_time = int(retry_after)
+            print(f"Rate limit hit. Retrying after {wait_time} seconds...")
+
+
+
+
+
+
+
+
+
+
+# Scraps all fixture of the previous $ seasons of the PL with statistics with each feature
 def scrap_data_team_past_fixtures():
 
     # Sending request to access FBRef and retrieving HTML content
@@ -17,7 +44,7 @@ def scrap_data_team_past_fixtures():
 
 
     # Seasons that will get extracted, and final output table initialized
-    years = [2024, 2023, 2022, 2021]
+    years = [2024.2025, 2023.2024, 2022.2023, 2021.2022]
     all_fixtures = []
 
 
@@ -54,60 +81,66 @@ def scrap_data_team_past_fixtures():
 
             # On each club home page there's a hyperlink to their shooting stats per fixture
             # We want to access some shooting statistics for our predictions
+            # For each anchor tag with a href value check if it is for the shooting table
             club_page_soup = BeautifulSoup(club_page.text, features="lxml")
-            # club_shooting_table_href = next(
-            #     ("https://fbref.com" + club_page_hrefs["href"]
-            #         for club_page_hrefs in club_page_soup.find_all("a", href=True)
-            #         if "/all_comps/shooting/" in club_page_hrefs["href"]
-            #      ),
-            #     None
-            # )
-
-            club_page_hyperlinks = club_page_soup.find_all("a")
-            shooting_table_link = "https://fbref.com"
-            for link in club_page_hyperlinks:
-                shooting_link = link.get("href")
-                if shooting_link and "/all_comps/shooting/" in shooting_link:
-                    shooting_table_link += shooting_link
-                    print(shooting_table_link)
-                    break
+            club_shooting_table_href = next(
+                ("https://fbref.com" + club_page_hrefs["href"]
+                    for club_page_hrefs in club_page_soup.find_all("a", href=True)
+                    if "/all_comps/shooting/" in club_page_hrefs["href"]
+                 ),
+                None
+            )
 
 
-            # Getting list of fixtures with shooting stats
-            # club_shooting_fixture_page = requests.get(shooting_table_link)          # Request to download HTML
-            # club_shooting_fixtures = pd.read_html(StringIO(club_shooting_fixture_page.text),
-            #                                       match="Shooting")[0]
-            #
-            # club_shooting_fixtures.columns = club_shooting_fixtures.columns.droplevel()  # Dropping the first headers
-            #
-            # club_fixtures = club_fixtures[["Date", "Comp", "Venue", "Result", "GF", "GA",
-            #                               "Opponent", "xG", "xGA", "Poss"]]
-            #
-            # try:
-            #     fixtures = club_fixtures.merge(club_shooting_fixtures[
-            #                                        ["Date", "Sh", "SoT", "SoT%", "G/Sh", "G/SoT"]], on="Date")
-            # except ValueError:
-            #     continue
-            #
-            #
-            # fixtures = fixtures[fixtures["Comp"] == "Premier League"]
-            # fixtures["Season"] = season
-            # fixtures["Club"] = club_url.split("/")[-1].replace("-Stats", "").replace("-", " ")
-            # all_fixtures.append(fixtures)
-            # time.sleep(8)
+
+            # Accessing the Shootings Stats per fixture table of each team and getting certain statistics
+            # The Shooting Stats per Fixture table is the first table on this page
+            club_shooting_fixture_page = requests.get(club_shooting_table_href)
+            club_shooting_fixtures = pd.read_html(StringIO(club_shooting_fixture_page.text), match="Shooting")[0]
+            club_shooting_fixtures.columns = club_shooting_fixtures.columns.droplevel()
 
 
+
+            # Keep these selected columns from the Fixture table of the club
+            club_fixtures = club_fixtures[["Date", "Comp", "Venue", "Result", "GF", "GA",
+                                          "Opponent", "xG", "xGA", "Poss"]]
+
+            # Keep these selected columns from the Shootings Stats per Fixture table of the club
+            club_shooting_fixtures = club_shooting_fixtures[["Date", "Sh", "SoT", "SoT%", "G/Sh", "G/SoT"]]
+
+            # Merging both Tables to get the full Fixture table of Each Club
+            try:
+                fixtures = club_fixtures.merge(club_shooting_fixtures, on="Date")
+            except ValueError:
+                continue
+
+
+
+            # Final formatting of the Data
+            # Removing all fixtures that are not in the Premier League
+            # Adding a Column to indicate the Season, and a column to Indicate the club
+            fixtures = fixtures[fixtures["Comp"] == "Premier League"]
+            fixtures["Season"] = season
+            fixtures["Club"] = club_url.split("/")[-1].replace("-Stats", "").replace("-", " ")
+
+
+            # Appending to data frame to the all fixtures list and waiting to not get blocked from website
+            all_fixtures.append(fixtures)
+            time.sleep(8)
+
+
+
+        # Changing the page to the Premier League Standings page of the previous season.
         page = requests.get("https://fbref.com" + page_soup.select("a.prev")[0].get("href"))
 
 
 
+    # Appending all the Dataframes in the list to each other to make on Data frame
+    # THen outputting the DataFrame as a csv
     all_fixtures_df = pd.concat(all_fixtures)
     all_fixtures_df.to_csv("AllFixtures.csv")
 
-
-
-scrap_data_team_past_fixtures()
-
+    return "AllFixtures.csv"
 
 
 
@@ -115,12 +148,17 @@ scrap_data_team_past_fixtures()
 
 
 
+
+
+# Fetches this season's team statistics for each team
+# TODO : Figure out how to incorporate this
+# TODO : Properly comment this function
 def scrap_data_team_season_stats():
     fb_ref_url = "https://fbref.com/en/comps/9/Premier-League-Stats"
 
-    page = requests.get(fb_ref_url)                                             # Request and download HTML of page
-    standard_stats_df = pd.read_html(StringIO(page.text))[2]                    # Parse for third table on the page
-    standard_stats_df.columns = standard_stats_df.columns.droplevel()           # drop first header column
+    page = requests.get(fb_ref_url)
+    standard_stats_df = pd.read_html(StringIO(page.text))[2]
+    standard_stats_df.columns = standard_stats_df.columns.droplevel()
 
 
     standard_stats_df = standard_stats_df[["Squad", "Poss", "Gls", "G+A", "PrgP", "Gls"]]
@@ -155,6 +193,6 @@ def scrap_data_team_season_stats():
 
     season_stats = pd.merge(current_form_table, ag_shootings_df, on="Squad")
 
-    season_stats.to_csv("AllFixtures.csv")
+    season_stats.to_csv("ClubSeasonStats.csv")
 
 
