@@ -96,6 +96,7 @@ def scrap_data_team_past_fixtures():
             # Accessing the Shootings Stats per fixture table of each team and getting certain statistics
             # The Shooting Stats per Fixture table is the first table on this page
             club_shooting_fixture_page = requests.get(club_shooting_table_href)
+            print(club_url)
             club_shooting_fixtures = pd.read_html(StringIO(club_shooting_fixture_page.text), match="Shooting")[0]
             club_shooting_fixtures.columns = club_shooting_fixtures.columns.droplevel()
 
@@ -126,7 +127,7 @@ def scrap_data_team_past_fixtures():
 
             # Appending to data frame to the all fixtures list and waiting to not get blocked from website
             all_fixtures.append(fixtures)
-            time.sleep(8)
+            time.sleep(10)
 
 
 

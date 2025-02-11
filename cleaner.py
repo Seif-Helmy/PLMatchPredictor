@@ -4,7 +4,10 @@ pd.set_option('display.max_columns', None)  # Show all columns
 
 
 
-def clean_fixtures_table(csv_file):
+
+# The current_form_games takes the number of games that should be considered before
+# the game we are trying to predict to compute the rolling averages for.
+def clean_fixtures_table(csv_file, current_form_games):
 
     # Loading the csv file as a pandas DataFrame
     past_fixtures = pd.read_csv(csv_file, index_col=0)
@@ -45,7 +48,7 @@ def clean_fixtures_table(csv_file):
     # Then compute ethe mean of certain column to get the tolling averages of the past 10 games
     # The Club Column gets removed, so we need to re add it and drop the level the group by columns
     past_fixtures_with_rolling = past_fixtures.groupby("Club", group_keys=True).apply(
-        lambda x: rolling_averages(x, predictors_to_be_rolled, new_predictors_rolling, 6), include_groups=False)
+        lambda x: rolling_averages(x, predictors_to_be_rolled, new_predictors_rolling, current_form_games), include_groups=False)
     past_fixtures_with_rolling = past_fixtures_with_rolling.assign(Club=past_fixtures_with_rolling.index.get_level_values(0))
     past_fixtures_with_rolling = past_fixtures_with_rolling.droplevel("Club")
 
@@ -57,6 +60,11 @@ def clean_fixtures_table(csv_file):
     past_fixtures_with_rolling.index = range(past_fixtures_with_rolling.shape[0])
     past_fixtures_with_rolling = past_fixtures_with_rolling.drop(
         columns=['Comp', 'xG', 'xGA', 'Poss', 'Sh', 'SoT', 'SoT%', 'G/Sh', 'G/SoT'])
+
+
+    # list of final predictors
+    final_predictors = ["Venue", "OppCode", "ClubCode", "GF_Rolling", "GA_Rolling", "Poss_Rolling",
+                        "Sh_Rolling", "SoT_Rolling", "SoT%_Rolling", "G/Sh_Rolling", "G/SoT_Rolling"]
 
 
 
@@ -72,7 +80,7 @@ def clean_fixtures_table(csv_file):
 
 
     past_fixtures_with_rolling.to_csv("CleanedAllFixtures.csv", index=True)
-    return "CleanedAllFixtures.csv"
+    return "CleanedAllFixtures.csv", final_predictors
 
 
 

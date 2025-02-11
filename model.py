@@ -25,8 +25,8 @@ def make_predictions(data, predictors):
 
 
 
-make_predictions(pd.read_csv("CleanedAllFixtures.csv", index_col=0),
-                 ["Venue", "OppCode", "ClubCode", "GF_Rolling", "GA_Rolling", "Poss_Rolling", "Sh_Rolling",
-                  "SoT_Rolling", "SoT%_Rolling", "G/Sh_Rolling", "G/SoT_Rolling"])
+# make_predictions(pd.read_csv("CleanedAllFixtures.csv", index_col=0),
+#                  ["Venue", "OppCode", "ClubCode", "GF_Rolling", "GA_Rolling", "Poss_Rolling", "Sh_Rolling",
+#                   "SoT_Rolling", "SoT%_Rolling", "G/Sh_Rolling", "G/SoT_Rolling"])
 
 

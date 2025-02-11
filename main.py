@@ -6,7 +6,9 @@ from cleaner import clean_fixtures_table
 
 
 def main():
-    fixtures_data = get_and_clean_club_fixtures_data()
+    fixtures_data, predictors = get_and_clean_club_fixtures_data()
+
+    print(fixtures_data)
 
 
 
@@ -18,7 +20,7 @@ def get_and_clean_club_fixtures_data():
     csv_file_path = scrap_data_team_past_fixtures()
 
     # Cleaning the Data
-    return clean_fixtures_table(csv_file_path)
+    return clean_fixtures_table(csv_file_path, 8)
 
 
 
