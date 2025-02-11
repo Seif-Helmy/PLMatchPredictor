@@ -5,7 +5,8 @@ from sklearn.metrics import accuracy_score, precision_score
 
 
 
-
+# MODEL NOT PERFORMING WELL
+# NEED TO INTEGRATE TEH SECOND TABLE SCRAPPED FROM SCRAPPER.PY
 def make_predictions(data, predictors):
     pl_data = pd.read_csv(data, index_col=0)
 
@@ -15,8 +16,8 @@ def make_predictions(data, predictors):
     pl_data = pl_data.sort_values("Date")
 
 
-    # Here we use an 85%/15% train/test split
-    splitting_index = int(len(pl_data) * 0.85)
+    # Here we use an 90%/10% train/test split
+    splitting_index = int(len(pl_data) * 0.9)
     training_data = pl_data.iloc[:splitting_index]
     test_data = pl_data[splitting_index:]
 
@@ -37,7 +38,7 @@ def make_predictions(data, predictors):
 
     # Evaluate model
     accuracy = accuracy_score(y_test, predictions)
-    precision = precision_score(y_test, predictions, average='binary')  # Adjust if multi-class
+    precision = precision_score(y_test, predictions)
 
 
     print(f"Accuracy: {accuracy:.4f}")
